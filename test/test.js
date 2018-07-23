@@ -1561,6 +1561,18 @@ describe('node-fetch', () => {
 		});
 	});
 
+	it('should call onrequest callback with an http.ClientRequest instance', function() {
+		let onrequestArgument;
+
+		return fetch('https://github.com/', {
+			onrequest(argument) {
+				onrequestArgument = argument;
+			}
+		}).then(() => {
+			expect(onrequestArgument).to.be.an.instanceof(http.ClientRequest);
+		});
+	});
+
 	// issue #414
 	it('should reject if attempt to accumulate body stream throws', function () {
 		let body = resumer().queue('a=1').end();

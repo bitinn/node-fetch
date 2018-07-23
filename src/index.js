@@ -202,6 +202,10 @@ export default function fetch(url, opts) {
 			resolve(new Response(body, response_options));
 		});
 
+		if (request.onrequest) {
+			request.onrequest(req);
+		}
+
 		writeToStream(req, request);
 	});
 

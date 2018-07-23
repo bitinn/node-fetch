@@ -218,8 +218,22 @@ The default values are shown after each option key.
 	compress: true,     // support gzip/deflate content encoding. false to disable
 	size: 0,            // maximum response body size in bytes. 0 to disable
 	agent: null         // http(s).Agent instance, allows custom proxy, certificate, lookup, family etc.
+	onrequest: null     // a callback to be called with `http.ClientRequest`.
 }
 ```
+
+###### Intercepting `http.ClientRequest` with `onrequest` callback
+
+`onrequest` callback will be called with underlying `http.ClientRequest` as
+the first argument immediately before flushing. It is assured that the following
+operations on `http.ClientRequest` can be performed:
+
+* Modifying `maxHeadersCount` property to inspect or change the maximum response headers count.
+* Calling `removeHeader` and `setHeader` method to modify any headers to be sent.
+* Calling `setNoDelay`, `setSocketKeepAlive`, and `setTimeout` method, expecting the documented behavior.
+
+Other operations with side effects on `http.ClientRequest` can cause an
+unexpected behavior.
 
 ##### Default Headers
 
