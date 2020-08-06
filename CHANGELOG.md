@@ -5,6 +5,9 @@ Changelog
 
 # 2.x release
 
+## v2.6.1
+- Enhance: `Response` object now includes conditional `timings` property.
+
 ## v2.6.0
 
 - Enhance: `options.agent`, it now accepts a function that returns custom http(s).Agent instance based on current URL, see readme for more information.

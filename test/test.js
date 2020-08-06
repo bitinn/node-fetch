@@ -2869,4 +2869,22 @@ describe('external encoding', () => {
 			});
 		});
 	});
+  
+	describe('timings', function() {
+		it('should not return timings if not configured', function() {
+			const url = `${base}hello`;
+			return fetch(url)
+			.then(res => {
+				expect(res.timings).to.be.undefined;
+			});
+		});
+		
+		it('should return timings if configured', function() {
+			const url = `${base}hello`;
+			return fetch(url, {timings: true})
+			.then(res => {
+				expect(res).to.be.an.instanceOf(Object);
+			});
+		});
+	});
 });

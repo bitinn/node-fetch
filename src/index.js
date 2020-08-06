@@ -83,6 +83,12 @@ export default function fetch(url, opts) {
 
 		// send request
 		const req = send(options);
+
+		// add request timings
+		if (opts && opts.timings) {
+			let timer = require('@szmarczak/http-timer');
+			timer(req);
+		}
 		let reqTimeout;
 
 		if (signal) {
@@ -201,7 +207,8 @@ export default function fetch(url, opts) {
 				headers: headers,
 				size: request.size,
 				timeout: request.timeout,
-				counter: request.counter
+				counter: request.counter,
+				timings: res.timings
 			};
 
 			// HTTP-network fetch step 12.1.1.3

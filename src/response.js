@@ -24,6 +24,7 @@ const STATUS_CODES = http.STATUS_CODES;
  */
 export default class Response {
 	constructor(body = null, opts = {}) {
+		this.timings = opts.timings;
 		Body.call(this, body, opts);
 
 		const status = opts.status || 200;

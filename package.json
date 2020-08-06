@@ -1,6 +1,6 @@
 {
   "name": "node-fetch",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "A light-weight module that brings window.fetch to node.js",
   "main": "lib/index",
   "browser": "./browser.js",
@@ -62,5 +62,7 @@
     "string-to-arraybuffer": "^1.0.2",
     "whatwg-url": "^5.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@szmarczak/http-timer": "^4.0.5"
+  }
 }
