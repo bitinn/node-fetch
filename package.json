@@ -1,138 +1,137 @@
 {
-	"name": "node-fetch",
-	"version": "3.0.0-beta.8",
-	"description": "A light-weight module that brings Fetch API to node.js",
-	"main": "./dist/index.cjs",
-	"module": "./src/index.js",
-	"sideEffects": false,
-	"type": "module",
-	"exports": {
-		".": {
-			"import": "./src/index.js",
-			"require": "./dist/index.cjs"
-		},
-		"./package.json": "./package.json"
-	},
-	"files": [
-		"src",
-		"dist",
-		"@types/index.d.ts"
-	],
-	"types": "./@types/index.d.ts",
-	"engines": {
-		"node": "^10.17 || >=12.3"
-	},
-	"scripts": {
-		"build": "rollup -c",
-		"test": "node --experimental-modules node_modules/c8/bin/c8 --reporter=html --reporter=lcov --reporter=text --check-coverage node --experimental-modules node_modules/mocha/bin/mocha",
-		"coverage": "c8 report --reporter=text-lcov | coveralls",
-		"test-types": "tsd",
-		"lint": "xo",
-		"prepublishOnly": "node ./test/commonjs/test-artifact.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/node-fetch/node-fetch.git"
-	},
-	"keywords": [
-		"fetch",
-		"http",
-		"promise",
-		"request",
-		"curl",
-		"wget",
-		"xhr",
-		"whatwg"
-	],
-	"author": "David Frank",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/node-fetch/node-fetch/issues"
-	},
-	"homepage": "https://github.com/node-fetch/node-fetch",
-	"funding": {
-		"type": "opencollective",
-		"url": "https://opencollective.com/node-fetch"
-	},
-	"devDependencies": {
-		"abort-controller": "^3.0.0",
-		"abortcontroller-polyfill": "^1.4.0",
-		"busboy": "^0.3.1",
-		"c8": "^7.1.2",
-		"chai": "^4.2.0",
-		"chai-as-promised": "^7.1.1",
-		"chai-iterator": "^3.0.2",
-		"chai-string": "^1.5.0",
-		"coveralls": "^3.1.0",
-		"delay": "^4.3.0",
-		"form-data": "^3.0.0",
-		"formdata-node": "^2.2.0",
-		"mocha": "^8.0.0",
-		"p-timeout": "^3.2.0",
-		"rollup": "^2.15.0",
-		"tsd": "^0.13.1",
-		"xo": "^0.32.0"
-	},
-	"dependencies": {
-		"data-uri-to-buffer": "^3.0.1",
-		"fetch-blob": "^2.0.0"
-	},
-	"esm": {
-		"sourceMap": true,
-		"cjs": false
-	},
-	"tsd": {
-		"cwd": "@types",
-		"compilerOptions": {
-			"target": "esnext",
-			"lib": [
-				"es2018"
-			],
-			"allowSyntheticDefaultImports": false,
-			"esModuleInterop": false
-		}
-	},
-	"xo": {
-		"envs": [
-			"node",
-			"browser"
-		],
-		"rules": {
-			"complexity": 0,
-			"import/extensions": 0,
-			"import/no-useless-path-segments": 0,
-			"import/no-anonymous-default-export": 0,
-			"unicorn/import-index": 0,
-			"unicorn/no-reduce": 0,
-			"capitalized-comments": 0
-		},
-		"ignores": [
-			"dist",
-			"@types"
-		],
-		"overrides": [{
-				"files": "test/**/*.js",
-				"envs": [
-					"node",
-					"mocha"
-				],
-				"rules": {
-					"max-nested-callbacks": 0,
-					"no-unused-expressions": 0,
-					"new-cap": 0,
-					"guard-for-in": 0,
-					"unicorn/prevent-abbreviations": 0,
-					"promise/prefer-await-to-then": 0,
-					"ava/no-import-test-files": 0
-				}
-			},
-			{
-				"files": "example.js",
-				"rules": {
-					"import/no-extraneous-dependencies": 0
-				}
-			}
-		]
-	},
-	"runkitExampleFilename": "example.js"
+  "name": "node-fetch",
+  "version": "3.0.0-beta.7",
+  "description": "A light-weight module that brings Fetch API to node.js",
+  "main": "./dist/index.cjs",
+  "module": "./src/index.js",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "dist",
+    "@types/index.d.ts"
+  ],
+  "types": "./@types/index.d.ts",
+  "engines": {
+    "node": "^10.17 || >=12.3"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "node --experimental-modules node_modules/c8/bin/c8 --check-coverage node --experimental-modules node_modules/ava/cli --config ava.config.js",
+    "coverage": "c8 report --reporter=text-lcov | coveralls",
+    "test-types": "tsd",
+    "lint": "xo",
+    "prepublishOnly": "ava --config ava.config.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/node-fetch/node-fetch.git"
+  },
+  "keywords": [
+    "fetch",
+    "http",
+    "promise",
+    "request",
+    "curl",
+    "wget",
+    "xhr",
+    "whatwg"
+  ],
+  "author": "David Frank",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/node-fetch/node-fetch/issues"
+  },
+  "homepage": "https://github.com/node-fetch/node-fetch",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/node-fetch"
+  },
+  "devDependencies": {
+    "abort-controller": "^3.0.0",
+    "abortcontroller-polyfill": "^1.4.0",
+    "ava": "^3.8.2",
+    "busboy": "^0.3.1",
+    "c8": "^7.1.2",
+    "coveralls": "^3.1.0",
+    "delay": "^4.3.0",
+    "form-data": "^3.0.0",
+    "formdata-node": "^2.2.0",
+    "p-timeout": "^3.2.0",
+    "parted": "^0.1.1",
+    "rollup": "^2.15.0",
+    "string-to-arraybuffer": "^1.0.2",
+    "tsd": "^0.11.0",
+    "xo": "^0.32.0"
+  },
+  "dependencies": {
+    "data-uri-to-buffer": "^3.0.1",
+    "fetch-blob": "^2.0.0"
+  },
+  "esm": {
+    "sourceMap": true,
+    "cjs": false
+  },
+  "tsd": {
+    "cwd": "@types",
+    "compilerOptions": {
+      "target": "esnext",
+      "lib": [
+        "es2018"
+      ],
+      "allowSyntheticDefaultImports": false,
+      "esModuleInterop": false
+    }
+  },
+  "xo": {
+    "envs": [
+      "node",
+      "browser"
+    ],
+    "rules": {
+      "complexity": 0,
+      "import/extensions": 0,
+      "import/no-useless-path-segments": 0,
+      "import/no-anonymous-default-export": 0,
+      "unicorn/import-index": 0,
+      "unicorn/no-reduce": 0,
+      "capitalized-comments": 0
+    },
+    "ignores": [
+      "dist",
+      "@types"
+    ],
+    "overrides": [
+      {
+        "files": "test/**/*.js",
+        "envs": [
+          "node",
+          "mocha"
+        ],
+        "rules": {
+          "max-nested-callbacks": 0,
+          "no-unused-expressions": 0,
+          "new-cap": 0,
+          "guard-for-in": 0,
+          "unicorn/prevent-abbreviations": 0,
+          "promise/prefer-await-to-then": 0,
+          "ava/no-import-test-files": 0
+        }
+      },
+      {
+        "files": "example.js",
+        "rules": {
+          "import/no-extraneous-dependencies": 0
+        }
+      }
+    ]
+  },
+  "runkitExampleFilename": "example.js"
 }

@@ -1,0 +1,14 @@
+{
+	"all": true,
+	"exclude": [
+		"{coverage,test,test-new}/**",
+		"*.config.js",
+		"example.js",
+		"@types"
+	],
+	"reporter": [
+		"html",
+		"lcov",
+		"text"
+	]
+}
