@@ -46,7 +46,13 @@ export default function fetch(url, opts) {
 		const request = new Request(url, opts);
 		const options = getNodeRequestOptions(request);
 
-		const send = (options.protocol === 'https:' ? https : http).request;
+    const protocol = (options.protocol === 'https:' ? https : http)
+		const send = protocol.request;
+
+ 		if (options.agent && typeof options.agent === 'object' && !(options.agent instanceof http.Agent)) {
+ 			options.agent = new protocol.Agent(options.agent)
+ 		}
+
 		const { signal } = request;
 		let response = null;
 

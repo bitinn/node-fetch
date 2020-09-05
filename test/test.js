@@ -1775,6 +1775,20 @@ describe('node-fetch', () => {
 		});
 	});
 
+  it('should create http.Agent class if options.agent is provided as an object', function() {
+		const url = `${base}inspect`;
+ 		const opts = {
+ 			agent: {
+ 				keepAlive: true
+ 			}
+ 		};
+ 		return fetch(url, opts).then(res => {
+ 			return res.json();
+ 		}).then(res => {
+ 			expect(res.headers['connection']).to.equal('keep-alive');
+ 		});
+ 	});
+
 	it('should send request with connection keep-alive if agent is provided', function() {
 		const url = `${base}inspect`;
 		const opts = {
