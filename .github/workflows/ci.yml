@@ -51,13 +51,12 @@ jobs:
       - run: npm test -- --colors
         if: matrix.node != 'engines'
 
-      - name: Test without coverage
+      - name: Test with nyc coverage
         if: matrix.node == 'engines'
         run: |
-          npm i esm
-          npx mocha -r esm --colors
+          npm i esm nyc
+          npx nyc --require esm --reporter=lcov --reporter=text mocha --colors
 
-      # upload coverage only once
       - name: Coveralls
         uses: coverallsapp/github-action@master
         if: matrix.node == '12' && matrix.os == 'ubuntu-latest'

@@ -7,6 +7,8 @@
 
 import Stream, {PassThrough} from 'stream';
 import {types} from 'util';
+import Worker from './utils/worker_thread/index.js';
+import {once} from 'events';
 
 import Blob from 'fetch-blob';
 
@@ -16,6 +18,7 @@ import {formDataIterator, getBoundary, getFormDataLength} from './utils/form-dat
 import {isBlob, isURLSearchParameters, isFormData} from './utils/is.js';
 
 const INTERNALS = Symbol('Body internals');
+const NODE_FETCH_THREADED_PARSER_THRESHOLD = Number.parseInt(process.env.NODE_FETCH_THREADED_PARSER_THRESHOLD || '50000', 10);
 
 /**
  * Body mixin
@@ -113,11 +116,20 @@ export default class Body {
 	/**
 	 * Decode response as json
 	 *
-	 * @return  Promise
+	 * @returns {Promise<unknown>}
 	 */
 	async json() {
-		const buffer = await consumeBody(this);
-		return JSON.parse(buffer.toString());
+		const text = await this.text();
+		if (text.length > NODE_FETCH_THREADED_PARSER_THRESHOLD && typeof Worker === 'function') {
+			const worker = new Worker(`
+			const { parentPort, workerData } = require('worker_threads');
+			parentPort.postMessage(JSON.parse(workerData));
+			`, {eval: true, workerData: text});
+			const [json] = await once(worker, 'message');
+			return json;
+		}
+
+		return JSON.parse(text);
 	}
 
 	/**

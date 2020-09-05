@@ -1,26 +1,17 @@
 
-import * as stream from 'stream';
-import {TextEncoder} from 'util';
+import stream from 'stream';
 import chai from 'chai';
+import chaiPromised from 'chai-as-promised';
+import {TextEncoder} from 'util';
 import Blob from 'fetch-blob';
+import {builtinModules} from 'module';
+import {randomBytes} from 'crypto';
 import {Response} from '../src/index.js';
-import TestServer from './utils/server.js';
 
 const {expect} = chai;
+chai.use(chaiPromised);
 
 describe('Response', () => {
-	const local = new TestServer();
-	let base;
-
-	before(async () => {
-		await local.start();
-		base = `http://${local.hostname}:${local.port}/`;
-	});
-
-	after(async () => {
-		return local.stop();
-	});
-
 	it('should have attributes conforming to Web IDL', () => {
 		const res = new Response();
 		const enumerableProperties = [];
@@ -119,13 +110,13 @@ describe('Response', () => {
 			headers: {
 				a: '1'
 			},
-			url: base,
+			url: 'https://dummy.com',
 			status: 346,
 			statusText: 'production'
 		});
 		const cl = res.clone();
 		expect(cl.headers.get('a')).to.equal('1');
-		expect(cl.url).to.equal(base);
+		expect(cl.url).to.equal('https://dummy.com');
 		expect(cl.status).to.equal(346);
 		expect(cl.statusText).to.equal('production');
 		expect(cl.ok).to.be.false;
@@ -205,4 +196,30 @@ describe('Response', () => {
 		const res = new Response();
 		expect(res.url).to.equal('');
 	});
+
+	if (builtinModules.includes('worker_threads')) {
+		it('should not block message loop on large json', async () => {
+			const bigObject = {
+				a: randomBytes(0o100000).toString('hex'),
+				b: [randomBytes(0xFFFF).toString('base64')]
+			};
+			const res = new Response(JSON.stringify(bigObject));
+			let ticks = 0;
+			const json = await Promise.race([res.json(), new Promise(resolve => {
+				const interval = setInterval(() => {
+					ticks++;
+					if (ticks > 500) {
+						resolve(clearInterval(interval));
+					}
+				}, 0);
+			})]);
+			expect(ticks).to.be.greaterThan(5); // magic number, but it's actually is 0 when sync JSON.parse is used
+			expect(json).to.be.deep.equal(bigObject);
+		});
+
+		it('should be possible to catch JSON parsing error on a large response', async () => {
+			const res = new Response(randomBytes(0xFFFF).toString('base64'));
+			return expect(res.json()).to.eventually.be.rejectedWith(SyntaxError, /Unexpected/);
+		});
+	}
 });
