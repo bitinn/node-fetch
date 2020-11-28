@@ -7,6 +7,7 @@
 import {types} from 'util';
 import http from 'http';
 
+/* c8 ignore next 9 */
 const validateHeaderName = typeof http.validateHeaderName === 'function' ?
 	http.validateHeaderName :
 	name => {
@@ -17,6 +18,7 @@ const validateHeaderName = typeof http.validateHeaderName === 'function' ?
 		}
 	};
 
+/* c8 ignore next 9 */
 const validateHeaderValue = typeof http.validateHeaderValue === 'function' ?
 	http.validateHeaderValue :
 	(name, value) => {
@@ -141,8 +143,8 @@ export default class Headers extends URLSearchParams {
 						return Reflect.get(target, p, receiver);
 				}
 			}
-			/* c8 ignore next */
 		});
+		/* c8 ignore next */
 	}
 
 	get [Symbol.toStringTag]() {
