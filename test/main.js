@@ -2127,6 +2127,31 @@ describe('node-fetch', () => {
 		expect(extractContentType(null)).to.be.null;
 	});
 
+	it('should calculate content length and extract content type for spec-compliant FormData', () => {
+		const url = `${base}hello`;
+		const bodyContent = 'a=1';
+
+		// stub spec-compliant FormData object
+		const formBody = new Map([bodyContent.split('=')]);
+		Object.defineProperties(formBody, {
+			append: {value: () => {}},
+			getAll: {value: () => {}}
+		});
+		Object.defineProperty(formBody, Symbol.toStringTag, {value: 'FormData'});
+
+		// create a stub Request object
+		const formRequest = new Request(url, {
+			method: 'POST',
+			body: formBody,
+			size: 1024
+		});
+		// override the body to be the original formBody object
+		Object.defineProperty(formRequest, 'body', {value: formBody});
+
+		expect(getTotalBytes(formRequest)).to.equal(141);
+		expect(extractContentType(formBody, formRequest)).to.startWith('multipart/form-data');
+	});
+
 	it('should encode URLs as UTF-8', async () => {
 		const url = `${base}möbius`;
 		const res = await fetch(url);

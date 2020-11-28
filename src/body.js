@@ -351,7 +351,7 @@ export const getTotalBytes = request => {
 
 	// Body is a spec-compliant form-data
 	if (isFormData(body)) {
-		return getFormDataLength(request[INTERNALS].boundary);
+		return getFormDataLength(body, request[INTERNALS].boundary);
 	}
 
 	// Body is stream
