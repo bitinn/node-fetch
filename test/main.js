@@ -2086,7 +2086,7 @@ describe('node-fetch', () => {
 		});
 
 		const formBody = new FormData();
-		formBody.append('a', '1');
+		formBody.append(...bodyContent.split('='));
 		const formRequest = new Request(url, {
 			method: 'POST',
 			body: formBody,
@@ -2114,7 +2114,7 @@ describe('node-fetch', () => {
 
 		expect(getTotalBytes(streamRequest)).to.be.null;
 		expect(getTotalBytes(blobRequest)).to.equal(blobBody.size);
-		expect(getTotalBytes(formRequest)).to.not.be.null;
+		expect(getTotalBytes(formRequest)).to.equal(formBody.getLengthSync());
 		expect(getTotalBytes(bufferRequest)).to.equal(bufferBody.length);
 		expect(getTotalBytes(stringRequest)).to.equal(bodyContent.length);
 		expect(getTotalBytes(nullRequest)).to.equal(0);
