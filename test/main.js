@@ -1354,6 +1354,7 @@ describe('node-fetch', () => {
 		return fetch(url, options).then(res => res.json()).then(res => {
 			expect(res.method).to.equal('POST');
 			expect(res.headers['content-type']).to.startWith('multipart/form-data');
+			expect(res.headers['content-length']).to.be.a('string');
 			expect(res.body).to.contain('field=');
 			expect(res.body).to.contain('file=');
 		});
