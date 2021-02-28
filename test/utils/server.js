@@ -231,6 +231,12 @@ export default class TestServer {
 			res.end();
 		}
 
+		if (p === '/redirect/301/otherhost') {
+			res.statusCode = 301;
+			res.setHeader('Location', 'https://github.com/node-fetch');
+			res.end();
+		}
+
 		if (p === '/redirect/302') {
 			res.statusCode = 302;
 			res.setHeader('Location', '/inspect');
@@ -289,7 +295,7 @@ export default class TestServer {
 		}
 
 		if (p === '/redirect/bad-location') {
-			res.socket.write('HTTP/1.1 301\r\nLocation: ☃\r\nContent-Length: 0\r\n');
+			res.socket.write('HTTP/1.1 301\r\nLocation: <>\r\nContent-Length: 0\r\n');
 			res.socket.end('\r\n');
 		}
 

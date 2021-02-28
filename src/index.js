@@ -138,11 +138,7 @@ export default async function fetch(url, options_) {
 						finalize();
 						return;
 					case 'manual':
-						// Node-fetch-specific step: make manual redirect a bit easier to use by setting the Location header value to the resolved URL.
-						if (locationURL !== null) {
-							headers.set('Location', locationURL);
-						}
-
+						// Nothing to do
 						break;
 					case 'follow': {
 						// HTTP-redirect fetch step 2
