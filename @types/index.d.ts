@@ -101,7 +101,7 @@ type BodyInit =
 	| NodeJS.ReadableStream
 	| string;
 type BodyType = { [K in keyof Body]: Body[K] };
-declare class Body {
+declare class Body<T = unknown> {
 	constructor(body?: BodyInit, opts?: { size?: number });
 
 	readonly body: NodeJS.ReadableStream | null;
@@ -111,7 +111,7 @@ declare class Body {
 	buffer(): Promise<Buffer>;
 	arrayBuffer(): Promise<ArrayBuffer>;
 	blob(): Promise<Blob>;
-	json(): Promise<unknown>;
+	json(): Promise<T>;
 	text(): Promise<string>;
 }
 
@@ -143,7 +143,7 @@ declare class Request extends Body {
 	clone(): Request;
 }
 
-declare class Response extends Body {
+declare class Response<T = unknown> extends Body<T> {
 	constructor(body?: BodyInit | null, init?: ResponseInit);
 
 	readonly headers: Headers;
@@ -172,7 +172,7 @@ declare class AbortError extends Error {
 }
 
 
-declare function fetch(url: RequestInfo, init?: RequestInit): Promise<Response>;
+declare function fetch<T = unknown>(url: RequestInfo, init?: RequestInit): Promise<Response<T>>;
 declare class fetch {
 	static default: typeof fetch;
 }
