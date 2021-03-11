@@ -71,7 +71,7 @@ export default class Request extends Body {
 		if (inputBody !== null && !headers.has('Content-Type')) {
 			const contentType = extractContentType(inputBody, this);
 			if (contentType) {
-				headers.append('Content-Type', contentType);
+				headers.set('Content-Type', contentType);
 			}
 		}
 

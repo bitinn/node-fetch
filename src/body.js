@@ -36,7 +36,7 @@ export default class Body {
 			// Body is undefined or null
 			body = null;
 		} else if (isURLSearchParameters(body)) {
-		// Body is a URLSearchParams
+			// Body is a URLSearchParams
 			body = Buffer.from(body.toString());
 		} else if (isBlob(body)) {
 			// Body is blob
@@ -52,7 +52,7 @@ export default class Body {
 			// Body is stream
 		} else if (isFormData(body)) {
 			// Body is an instance of formdata-node
-			boundary = `NodeFetchFormDataBoundary${getBoundary()}`;
+			boundary = `nodefetchformdataboundary${getBoundary()}`;
 			body = Stream.Readable.from(formDataIterator(body, boundary));
 		} else {
 			// None of the above
@@ -60,8 +60,17 @@ export default class Body {
 			body = Buffer.from(String(body));
 		}
 
+		let stream = body;
+
+		if (Buffer.isBuffer(body)) {
+			stream = Stream.Readable.from(body);
+		} else if (isBlob(body)) {
+			stream = body.stream();
+		}
+
 		this[INTERNALS] = {
 			body,
+			stream,
 			boundary,
 			disturbed: false,
 			error: null
@@ -79,7 +88,7 @@ export default class Body {
 	}
 
 	get body() {
-		return this[INTERNALS].body;
+		return this[INTERNALS].stream;
 	}
 
 	get bodyUsed() {
@@ -168,21 +177,11 @@ async function consumeBody(data) {
 		throw data[INTERNALS].error;
 	}
 
-	let {body} = data;
+	const {body} = data;
 
 	// Body is null
 	if (body === null) {
 		return Buffer.alloc(0);
-	}
-
-	// Body is blob
-	if (isBlob(body)) {
-		body = body.stream();
-	}
-
-	// Body is buffer
-	if (Buffer.isBuffer(body)) {
-		return body;
 	}
 
 	/* c8 ignore next 3 */
@@ -240,7 +239,7 @@ async function consumeBody(data) {
 export const clone = (instance, highWaterMark) => {
 	let p1;
 	let p2;
-	let {body} = instance;
+	let {body} = instance[INTERNALS];
 
 	// Don't allow cloning a used body
 	if (instance.bodyUsed) {
@@ -256,7 +255,7 @@ export const clone = (instance, highWaterMark) => {
 		body.pipe(p1);
 		body.pipe(p2);
 		// Set instance body to teed body and return the other teed body
-		instance[INTERNALS].body = p1;
+		instance[INTERNALS].stream = p1;
 		body = p2;
 	}
 
@@ -327,7 +326,7 @@ export const extractContentType = (body, request) => {
  * @returns {number | null}
  */
 export const getTotalBytes = request => {
-	const {body} = request;
+	const {body} = request[INTERNALS];
 
 	// Body is null or undefined
 	if (body === null) {
@@ -369,16 +368,8 @@ export const writeToStream = (dest, {body}) => {
 	if (body === null) {
 		// Body is null
 		dest.end();
-	} else if (isBlob(body)) {
-		// Body is Blob
-		body.stream().pipe(dest);
-	} else if (Buffer.isBuffer(body)) {
-		// Body is buffer
-		dest.write(body);
-		dest.end();
 	} else {
 		// Body is stream
 		body.pipe(dest);
 	}
 };
-

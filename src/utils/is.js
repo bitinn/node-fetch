@@ -35,6 +35,7 @@ export const isURLSearchParameters = object => {
  */
 export const isBlob = object => {
 	return (
+		object &&
 		typeof object === 'object' &&
 		typeof object.arrayBuffer === 'function' &&
 		typeof object.type === 'string' &&

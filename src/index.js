@@ -12,7 +12,7 @@ import zlib from 'zlib';
 import Stream, {PassThrough, pipeline as pump} from 'stream';
 import dataUriToBuffer from 'data-uri-to-buffer';
 
-import {writeToStream} from './body.js';
+import {writeToStream, clone} from './body.js';
 import Response from './response.js';
 import Headers, {fromRawHeaders} from './headers.js';
 import Request, {getNodeRequestOptions} from './request.js';
@@ -166,7 +166,7 @@ export default async function fetch(url, options_) {
 							agent: request.agent,
 							compress: request.compress,
 							method: request.method,
-							body: request.body,
+							body: clone(request),
 							signal: request.signal,
 							size: request.size
 						};
