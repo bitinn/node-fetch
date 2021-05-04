@@ -107,9 +107,8 @@ describe('node-fetch', () => {
 		return expect(fetch(url)).to.eventually.be.rejectedWith(TypeError, /URL scheme "ftp" is not supported/);
 	});
 
-	it('should reject with error on network failure', function () {
-		this.timeout(5000);
-		const url = 'http://localhost:50000/';
+	it('should reject with error on network failure', () => {
+		const url = 'http://localhost:6/';
 		return expect(fetch(url)).to.eventually.be.rejected
 			.and.be.an.instanceOf(FetchError)
 			.and.include({type: 'system', code: 'ECONNREFUSED', errno: 'ECONNREFUSED'});
@@ -125,9 +124,8 @@ describe('node-fetch', () => {
 		return expect(err).to.not.have.property('erroredSysCall');
 	});
 
-	it('system error is extracted from failed requests', function () {
-		this.timeout(5000);
-		const url = 'http://localhost:50000/';
+	it('system error is extracted from failed requests', () => {
+		const url = 'http://localhost:6/';
 		return expect(fetch(url)).to.eventually.be.rejected
 			.and.be.an.instanceOf(FetchError)
 			.and.have.property('erroredSysCall');

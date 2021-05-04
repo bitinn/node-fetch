@@ -24,11 +24,17 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "test": "node --experimental-modules node_modules/c8/bin/c8 --reporter=html --reporter=lcov --reporter=text --check-coverage node --experimental-modules node_modules/mocha/bin/mocha",
+    "test:nocoverage": "mocha --colors",
+    "test": "c8 --reporter=html --reporter=lcov --reporter=text --check-coverage npm run test:nocoverage",
+    "test:experimental:nocoverage": "mocha --experimental-modules --colors",
+    "test:experimental": "c8 --reporter=html --reporter=lcov --reporter=text --check-coverage npm run test:experimental:nocoverage",
+    "test:esm:nocoverage": "mocha -r esm --colors",
+    "test:esm": "c8 --reporter=html --reporter=lcov --reporter=text --check-coverage npm run test:esm:nocoverage",
+    "test:cjs-build": "node ./test/commonjs/test-artifact.js",
+    "prepublishOnly": "npm run test:cjs-build",
     "coverage": "c8 report --reporter=text-lcov | coveralls",
     "test-types": "tsd",
-    "lint": "xo",
-    "prepublishOnly": "node ./test/commonjs/test-artifact.js"
+    "lint": "xo"
   },
   "repository": {
     "type": "git",
@@ -65,6 +71,7 @@
     "chai-string": "^1.5.0",
     "coveralls": "^3.1.0",
     "delay": "^4.4.0",
+    "esm": "^3.2.25",
     "form-data": "^3.0.0",
     "formdata-node": "^2.4.0",
     "mocha": "^8.1.3",

@@ -14,52 +14,59 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        node: ["14", "12", engines]
-        exclude:
-          # On Windows, run tests with only the LTS environments.
-          - os: windows-latest
-            node: engines
-          - os: windows-latest
-            node: "14"
-          # On macOS, run tests with only the LTS environments.
-          - os: macOS-latest
-            node: engines
-          - os: macOS-latest
-            node: "14"
+        node-version: [14.x, 12.x, 12.16.3, 12.3.0, min-engine]
 
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get Node.JS version from package.json
-        if: matrix.node == 'engines'
-        id: get-version
-        run: echo ::set-output name=node::$(npx --q minimum-node-version)
+      - name: Get minimum node-version from package.json
+        if: matrix.node-version == 'min-engine'
+        id: min-engine
+        run: echo "::set-output name=v::$(npx -q minimum-node-version)"
 
-      - uses: actions/setup-node@v2-beta
-        if: matrix.node != 'engines'
+      # Use minimum node version from package.json
+      - name: Use Node.js ${{ steps.min-engine.outputs.v }}
+        uses: actions/setup-node@v2-beta
+        if: matrix.node-version == 'min-engine'
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ${{ steps.min-engine.outputs.v }}
 
-      - uses: actions/setup-node@v2-beta
-        if: matrix.node == 'engines'
+      # check latest for "12.x"
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2-beta
+        if: matrix.node-version == '12.x'
         with:
-          node-version: ${{steps.get-version.outputs.node}}
+          node-version: ${{ matrix.node-version }}
+          check-latest: true
+
+      # don't check latest for all others
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2-beta
+        if: matrix.node-version != '12.x' && matrix.node-version != 'min-engine'
+        with:
+          node-version: ${{ matrix.node-version }}
 
       - run: npm install
 
-      - run: npm test -- --colors
-        if: matrix.node != 'engines'
+      # for node < 12.16
+      - run: npm run test:esm
+        if: matrix.node-version == '12.3.0' || matrix.node-version == 'min-engine'
 
-      - name: Test without coverage
-        if: matrix.node == 'engines'
-        run: |
-          npm i esm
-          npx mocha -r esm --colors
+      # for node ~ 12.16.x
+      - run: npm run test:experimental
+        if: matrix.node-version == '12.16.3'
+
+      # for node >= 12.17
+      - run: npm test
+        if: matrix.node-version == '14.x' || matrix.node-version == '12.x'
+
+      - run: npm run test:cjs-build
 
       # upload coverage only once
       - name: Coveralls
         uses: coverallsapp/github-action@master
-        if: matrix.node == '12' && matrix.os == 'ubuntu-latest'
+        if: matrix.node-version == '14.x' && matrix.os == 'ubuntu-latest'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
