@@ -297,6 +297,20 @@ export default class TestServer {
 			res.socket.end('\r\n');
 		}
 
+		if (p === '/redirect/referrer-policy') {
+			res.statusCode = 301;
+			res.setHeader('Location', '/inspect');
+			res.setHeader('Referrer-Policy', 'foo unsafe-url bar');
+			res.end();
+		}
+
+		if (p === '/redirect/referrer-policy/same-origin') {
+			res.statusCode = 301;
+			res.setHeader('Location', '/inspect');
+			res.setHeader('Referrer-Policy', 'foo unsafe-url same-origin bar');
+			res.end();
+		}
+
 		if (p === '/error/400') {
 			res.statusCode = 400;
 			res.setHeader('Content-Type', 'text/plain');

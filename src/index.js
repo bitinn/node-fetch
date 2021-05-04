@@ -19,6 +19,7 @@ import Request, {getNodeRequestOptions} from './request.js';
 import {FetchError} from './errors/fetch-error.js';
 import {AbortError} from './errors/abort-error.js';
 import {isRedirect} from './utils/is-redirect.js';
+import {parseReferrerPolicyFromHeader} from './utils/referrer.js';
 
 export {Headers, Request, Response, FetchError, AbortError, isRedirect};
 
@@ -168,7 +169,9 @@ export default async function fetch(url, options_) {
 							method: request.method,
 							body: request.body,
 							signal: request.signal,
-							size: request.size
+							size: request.size,
+							referrer: request.referrer,
+							referrerPolicy: request.referrerPolicy
 						};
 
 						// HTTP-redirect fetch step 9
@@ -183,6 +186,12 @@ export default async function fetch(url, options_) {
 							requestOptions.method = 'GET';
 							requestOptions.body = undefined;
 							requestOptions.headers.delete('content-length');
+						}
+
+						// HTTP-redirect fetch step 14
+						const responseReferrerPolicy = parseReferrerPolicyFromHeader(headers);
+						if (responseReferrerPolicy) {
+							requestOptions.referrerPolicy = responseReferrerPolicy;
 						}
 
 						// HTTP-redirect fetch step 15
