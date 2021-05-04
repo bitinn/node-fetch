@@ -37,6 +37,7 @@ export const isBlob = object => {
 	return (
 		typeof object === 'object' &&
 		typeof object.arrayBuffer === 'function' &&
+		typeof object.size === 'number' &&
 		typeof object.type === 'string' &&
 		typeof object.stream === 'function' &&
 		typeof object.constructor === 'function' &&
