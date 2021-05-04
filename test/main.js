@@ -821,6 +821,17 @@ describe('node-fetch', () => {
 		});
 	});
 
+	it('should handle empty deflate response', () => {
+		const url = `${base}empty/deflate`;
+		return fetch(url).then(res => {
+			expect(res.headers.get('content-type')).to.equal('text/plain');
+			return res.text().then(result => {
+				expect(result).to.be.a('string');
+				expect(result).to.be.empty;
+			});
+		});
+	});
+
 	it('should decompress brotli response', function () {
 		if (typeof zlib.createBrotliDecompress !== 'function') {
 			this.skip();

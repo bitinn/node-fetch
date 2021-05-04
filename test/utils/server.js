@@ -175,6 +175,13 @@ export default class TestServer {
 			});
 		}
 
+		if (p === '/empty/deflate') {
+			res.statusCode = 200;
+			res.setHeader('Content-Type', 'text/plain');
+			res.setHeader('Content-Encoding', 'deflate');
+			res.end();
+		}
+
 		if (p === '/sdch') {
 			res.statusCode = 200;
 			res.setHeader('Content-Type', 'text/plain');
