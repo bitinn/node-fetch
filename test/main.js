@@ -451,7 +451,10 @@ describe('node-fetch', () => {
 		return fetch(url, options).then(res => {
 			expect(res.url).to.equal(url);
 			expect(res.status).to.equal(301);
-			expect(res.headers.get('location')).to.equal(`${base}inspect`);
+			expect(res.headers.get('location')).to.equal('/inspect');
+
+			const locationURL = new URL(res.headers.get('location'), url);
+			expect(locationURL.href).to.equal(`${base}inspect`);
 		});
 	});
 
@@ -463,7 +466,22 @@ describe('node-fetch', () => {
 		return fetch(url, options).then(res => {
 			expect(res.url).to.equal(url);
 			expect(res.status).to.equal(301);
-			expect(res.headers.get('location')).to.equal(`${base}redirect/%C3%A2%C2%98%C2%83`);
+			expect(res.headers.get('location')).to.equal('<>');
+
+			const locationURL = new URL(res.headers.get('location'), url);
+			expect(locationURL.href).to.equal(`${base}redirect/%3C%3E`);
+		});
+	});
+
+	it('should support redirect mode to other host, manual flag', () => {
+		const url = `${base}redirect/301/otherhost`;
+		const options = {
+			redirect: 'manual'
+		};
+		return fetch(url, options).then(res => {
+			expect(res.url).to.equal(url);
+			expect(res.status).to.equal(301);
+			expect(res.headers.get('location')).to.equal('https://github.com/node-fetch');
 		});
 	});
 

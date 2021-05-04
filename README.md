@@ -589,6 +589,23 @@ console.dir(result);
 
 Passed through to the `insecureHTTPParser` option on http(s).request. See [`http.request`](https://nodejs.org/api/http.html#http_http_request_url_options_callback) for more information.
 
+#### Manual Redirect
+
+The `redirect: 'manual'` option for node-fetch is different from the browser & specification, which
+results in an [opaque-redirect filtered response](https://fetch.spec.whatwg.org/#concept-filtered-response-opaque-redirect).
+node-fetch gives you the typical [basic filtered response](https://fetch.spec.whatwg.org/#concept-filtered-response-basic) instead.
+
+```js
+const fetch = require('node-fetch');
+
+const response = await fetch('https://httpbin.org/status/301', { redirect: 'manual' });
+
+if (response.status === 301 || response.status === 302) {
+	const locationURL = new URL(response.headers.get('location'), response.url);
+	const response2 = await fetch(locationURL, { redirect: 'manual' });
+	console.dir(response2);
+}
+```
 
 <a id="class-request"></a>
 
