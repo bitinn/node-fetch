@@ -57,6 +57,7 @@ export function isFormData(object) {
 		typeof object.set === 'function' &&
 		typeof object.get === 'function' &&
 		typeof object.getAll === 'function' &&
+		typeof object.has === 'function' &&
 		typeof object.delete === 'function' &&
 		typeof object.keys === 'function' &&
 		typeof object.values === 'function' &&
