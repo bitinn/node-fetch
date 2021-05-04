@@ -14,6 +14,7 @@ import {FetchError} from './errors/fetch-error.js';
 import {FetchBaseError} from './errors/base.js';
 import {formDataIterator, getBoundary, getFormDataLength} from './utils/form-data.js';
 import {isBlob, isURLSearchParameters, isFormData} from './utils/is.js';
+import {blobToNodeStream} from './utils/blob-to-stream.js';
 
 const INTERNALS = Symbol('Body internals');
 
@@ -177,7 +178,7 @@ async function consumeBody(data) {
 
 	// Body is blob
 	if (isBlob(body)) {
-		body = body.stream();
+		body = blobToNodeStream(body);
 	}
 
 	// Body is buffer
@@ -371,7 +372,7 @@ export const writeToStream = (dest, {body}) => {
 		dest.end();
 	} else if (isBlob(body)) {
 		// Body is Blob
-		body.stream().pipe(dest);
+		blobToNodeStream(body).pipe(dest);
 	} else if (Buffer.isBuffer(body)) {
 		// Body is buffer
 		dest.write(body);

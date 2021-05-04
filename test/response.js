@@ -3,6 +3,7 @@ import * as stream from 'stream';
 import {TextEncoder} from 'util';
 import chai from 'chai';
 import Blob from 'fetch-blob';
+import buffer from 'buffer';
 import {Response} from '../src/index.js';
 import TestServer from './utils/server.js';
 
@@ -175,6 +176,15 @@ describe('Response', () => {
 			expect(result).to.equal('a=1');
 		});
 	});
+
+	if (buffer.Blob) {
+		it('should support Buffer.Blob as body', () => {
+			const res = new Response(new buffer.Blob(['a=1']));
+			return res.text().then(result => {
+				expect(result).to.equal('a=1');
+			});
+		});
+	}
 
 	it('should support Uint8Array as body', () => {
 		const encoder = new TextEncoder();
