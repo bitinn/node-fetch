@@ -61,6 +61,7 @@ export default class Body {
 		}
 
 		this[INTERNALS] = {
+			/** @type {Stream|Buffer|Blob|null} */
 			body,
 			boundary,
 			disturbed: false,
@@ -197,14 +198,15 @@ async function consumeBody(data) {
 
 	try {
 		for await (const chunk of body) {
-			if (data.size > 0 && accumBytes + chunk.length > data.size) {
+			const bytes = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+			if (data.size > 0 && accumBytes + bytes.byteLength > data.size) {
 				const err = new FetchError(`content size at ${data.url} over limit: ${data.size}`, 'max-size');
 				body.destroy(err);
 				throw err;
 			}
 
-			accumBytes += chunk.length;
-			accum.push(chunk);
+			accumBytes += bytes.byteLength;
+			accum.push(bytes);
 		}
 	} catch (error) {
 		if (error instanceof FetchBaseError) {
@@ -217,10 +219,6 @@ async function consumeBody(data) {
 
 	if (body.readableEnded === true || body._readableState.ended === true) {
 		try {
-			if (accum.every(c => typeof c === 'string')) {
-				return Buffer.from(accum.join(''));
-			}
-
 			return Buffer.concat(accum, accumBytes);
 		} catch (error) {
 			throw new FetchError(`Could not create Buffer from response body for ${data.url}: ${error.message}`, 'system', error);
@@ -323,7 +321,7 @@ export const extractContentType = (body, request) => {
  *
  * ref: https://fetch.spec.whatwg.org/#concept-body-total-bytes
  *
- * @param {any} obj.body Body object from the Body instance.
+ * @param {Body} request Body object from the Body instance.
  * @returns {number | null}
  */
 export const getTotalBytes = request => {

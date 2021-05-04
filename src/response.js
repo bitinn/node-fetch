@@ -27,7 +27,7 @@ export default class Response extends Body {
 		const headers = new Headers(options.headers);
 
 		if (body !== null && !headers.has('Content-Type')) {
-			const contentType = extractContentType(body);
+			const contentType = extractContentType(body, this);
 			if (contentType) {
 				headers.append('Content-Type', contentType);
 			}

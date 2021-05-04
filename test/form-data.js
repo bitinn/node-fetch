@@ -1,5 +1,7 @@
 import FormData from 'formdata-node';
 import Blob from 'fetch-blob';
+import {Response, Request} from '../src/index.js';
+import {getTotalBytes} from '../src/body.js';
 
 import chai from 'chai';
 
@@ -100,5 +102,31 @@ describe('FormData', () => {
 		form.set('blob', new Blob(['Hello, World!'], {type: 'text/plain'}));
 
 		expect(String(await read(formDataIterator(form, boundary)))).to.be.equal(expected);
+	});
+
+	it('Response supports FormData body', async () => {
+		const form = new FormData();
+		form.set('blob', new Blob(['Hello, World!'], {type: 'text/plain'}));
+
+		const response = new Response(form);
+		const type = response.headers.get('content-type') || '';
+		expect(type).to.match(/multipart\/form-data;\s*boundary=/);
+		expect(await response.text()).to.have.string('Hello, World!');
+		// Note: getTotalBytes assumes body could be form data but it never is
+		// because it gets normalized into a stream.
+		expect(getTotalBytes({...response, body: form})).to.be.greaterThan(20);
+	});
+
+	it('Request supports FormData body', async () => {
+		const form = new FormData();
+		form.set('blob', new Blob(['Hello, World!'], {type: 'text/plain'}));
+
+		const request = new Request('https://github.com/node-fetch/', {
+			body: form,
+			method: 'POST'
+		});
+		const type = request.headers.get('content-type') || '';
+		expect(type).to.match(/multipart\/form-data;\s*boundary=/);
+		expect(await request.text()).to.have.string('Hello, World!');
 	});
 });

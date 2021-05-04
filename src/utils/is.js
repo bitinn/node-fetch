@@ -11,7 +11,7 @@ const NAME = Symbol.toStringTag;
  * ref: https://github.com/node-fetch/node-fetch/issues/296#issuecomment-307598143
  *
  * @param  {*} obj
- * @return {boolean}
+ * @return {object is URLSearchParams}
  */
 export const isURLSearchParameters = object => {
 	return (
@@ -31,7 +31,7 @@ export const isURLSearchParameters = object => {
  * Check if `object` is a W3C `Blob` object (which `File` inherits from)
  *
  * @param  {*} obj
- * @return {boolean}
+ * @return {object is Blob}
  */
 export const isBlob = object => {
 	return (
@@ -48,7 +48,7 @@ export const isBlob = object => {
  * Check if `obj` is a spec-compliant `FormData` object
  *
  * @param {*} object
- * @return {boolean}
+ * @return {object is FormData}
  */
 export function isFormData(object) {
 	return (
@@ -70,7 +70,7 @@ export function isFormData(object) {
  * Check if `obj` is an instance of AbortSignal.
  *
  * @param  {*} obj
- * @return {boolean}
+ * @return {object is AbortSignal}
  */
 export const isAbortSignal = object => {
 	return (
