@@ -75,6 +75,8 @@ interface RequestInit {
 	 */
 	signal?: AbortSignal | null;
 
+	credentials?: 'omit' | 'same-origin' | 'include';
+
 	// Node-fetch extensions to the whatwg/fetch spec
 	agent?: Agent | ((parsedUrl: URL) => Agent);
 	compress?: boolean;
