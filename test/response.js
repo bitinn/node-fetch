@@ -123,7 +123,8 @@ describe('Response', () => {
 			},
 			url: base,
 			status: 346,
-			statusText: 'production'
+			statusText: 'production',
+			highWaterMark: 789
 		});
 		const cl = res.clone();
 		expect(cl.headers.get('a')).to.equal('1');
@@ -131,6 +132,7 @@ describe('Response', () => {
 		expect(cl.url).to.equal(base);
 		expect(cl.status).to.equal(346);
 		expect(cl.statusText).to.equal('production');
+		expect(cl.highWaterMark).to.equal(789)
 		expect(cl.ok).to.be.false;
 		// Clone body shouldn't be the same body
 		expect(cl.body).to.not.equal(body);

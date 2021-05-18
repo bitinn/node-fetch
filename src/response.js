@@ -93,7 +93,8 @@ export default class Response extends Body {
 			headers: this.headers,
 			ok: this.ok,
 			redirected: this.redirected,
-			size: this.size
+			size: this.size,
+			highWaterMark: this.highWaterMark
 		});
 	}
 
