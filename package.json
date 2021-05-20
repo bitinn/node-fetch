@@ -64,7 +64,7 @@
     "chai-iterator": "^3.0.2",
     "chai-string": "^1.5.0",
     "coveralls": "^3.1.0",
-    "delay": "^4.4.0",
+    "delay": "^5.0.0",
     "form-data": "^3.0.0",
     "formdata-node": "^2.4.0",
     "mocha": "^8.1.3",

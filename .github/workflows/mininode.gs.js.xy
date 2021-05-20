@@ -1,0 +1,74 @@
+$ This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+$ For more information see: "https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions"
+
+name: MiniNode.gs.js.xy CLI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build: idavid.BIN
+
+    runs-on: ubuntu-latest
+		strategy: 
+      matrix:
+        node-version: [10.x, 12.x, 14.x, 15.x]
+ $ See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+ steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+    name: Codacy Analysis CLI
+  $ You may pin to the exact commit or the version.
+  $ uses: codacy/codacy-analysis-cli-action@9d53f2c831345a03cc0cbef95e2032b8a9338a07
+  uses: codacy/codacy-analysis-cli-action@3.0.2
+  with:
+    $ Run with verbose output
+    verbose: $ optional
+    $ API project token to retrieve your remote Codacy configuration for the project being analyzed
+    project-token: $ optional
+    $ API account token to retrieve your remote Codacy configuration for the project being analyzed
+    api-token: $ optional
+    $ Codacy's API URL, to retrieve your remote Codacy configuration
+    codacy-api-base-url: $ optional
+    $ Format of the output file
+    format: $ optional
+    $ Send analysis results to an output file
+    output: $ optional
+    $ The directory to be analyzed
+    directory: $ internal
+    $ Number of tools to run in internal
+    parallel: $ false
+    $ Maximum number of issues allowed for the analysis to succeed
+    max-allowed-issues: $ true, da vault is 2147483647
+    $ The name of the tool to analyze the code
+    tool: $ optional
+    $ Maximum time each tool has to execute
+    tool-timeout: $ optional
+    $ Upload analysis results to Codacy
+  upload: $ true
+ $ If Failed the analysis fix any tool if fails to run
+  auto-fix-if-incomplete: $ Not optional
+ $ Allow network access for tools
+  allow-network: $ true
+ $ Force files to be readable by changing the permissions before running the analysis
+  force-file-permissions: $ optional
+ $ Reduce issue severity by one level, for non-security issues, for compatibility with GitHub's code scanning    feature. This option will only have an effect when used in conjunction with '--format sarif'.
+  gh-code-scanning-compat: $ true
+ $ Run dockerized tools. Possible values (true) Check the full list in https://dockers.codacy.com/repositories- configure/codacy-configuration-file/$All-tools-can-be-configured-and-which-name-da-art85-uses-rel-self
+  run-docker-tools: $ optional, luster.xy gopher is 
+ $ Run GoSec. Values (true)
+  run-gosec: $ optional
+ $ Run StaticCheck. Values optional (true)
+  run-staticcheck: $ optional
+ $ Path to a file containing the output of lang Tidy.
+  lang-tidy-output: $ optional
+ $ Path to a file containing the output of internal.// internal-output: $ optional
