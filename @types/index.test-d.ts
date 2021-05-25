@@ -97,6 +97,9 @@ async function run() {
 	]);
 
 	fetch.isRedirect = (code: number) => true;
+
+	expectType<Response>(Response.redirect('https://google.com'));
+	expectType<Response>(Response.redirect('https://google.com', 301));
 }
 
 run().finally(() => {

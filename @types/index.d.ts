@@ -158,6 +158,7 @@ declare class Response extends Body {
 	clone(): Response;
 
 	static error(): Response;
+	static redirect(url: string, status?: number): Response;
 }
 
 declare class FetchError extends Error {
