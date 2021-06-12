@@ -1,9 +1,6 @@
 # Sketch temporary file
 ~*.sketch
 
-# Generated files
-dist/
-
 # Logs
 logs
 *.log

@@ -1,7 +1,7 @@
 import http from 'http';
 import zlib from 'zlib';
-import Busboy from 'busboy';
 import {once} from 'events';
+import Busboy from 'busboy';
 
 export default class TestServer {
 	constructor() {
@@ -404,7 +404,7 @@ export default class TestServer {
 				body += `${fieldName}=${fileName}`;
 				// consume file data
 				// eslint-disable-next-line no-empty, no-unused-vars
-				for await (const c of file) { }
+				for await (const c of file) {}
 			});
 
 			busboy.on('field', (fieldName, value) => {

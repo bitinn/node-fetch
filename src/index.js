@@ -90,13 +90,13 @@ export default async function fetch(url, options_) {
 			}
 		};
 
-		request_.on('error', err => {
-			reject(new FetchError(`request to ${request.url} failed, reason: ${err.message}`, 'system', err));
+		request_.on('error', error => {
+			reject(new FetchError(`request to ${request.url} failed, reason: ${error.message}`, 'system', error));
 			finalize();
 		});
 
-		fixResponseChunkedTransferBadEnding(request_, err => {
-			response.body.destroy(err);
+		fixResponseChunkedTransferBadEnding(request_, error => {
+			response.body.destroy(error);
 		});
 
 		/* c8 ignore next 18 */
@@ -111,9 +111,9 @@ export default async function fetch(url, options_) {
 				s.prependListener('close', hadError => {
 					// if end happened before close but the socket didn't emit an error, do it now
 					if (response && endedWithEventsCount < s._eventsCount && !hadError) {
-						const err = new Error('Premature close');
-						err.code = 'ERR_STREAM_PREMATURE_CLOSE';
-						response.body.emit('error', err);
+						const error = new Error('Premature close');
+						error.code = 'ERR_STREAM_PREMATURE_CLOSE';
+						response.body.emit('error', error);
 					}
 				});
 			});
@@ -261,11 +261,7 @@ export default async function fetch(url, options_) {
 				const raw = pump(response_, new PassThrough(), reject);
 				raw.once('data', chunk => {
 					// See http://stackoverflow.com/questions/37519828
-					if ((chunk[0] & 0x0F) === 0x08) {
-						body = pump(body, zlib.createInflate(), reject);
-					} else {
-						body = pump(body, zlib.createInflateRaw(), reject);
-					}
+					body = (chunk[0] & 0x0F) === 0x08 ? pump(body, zlib.createInflate(), reject) : pump(body, zlib.createInflateRaw(), reject);
 
 					response = new Response(body, responseOptions);
 					resolve(response);
@@ -309,9 +305,9 @@ function fixResponseChunkedTransferBadEnding(request, errorCallback) {
 
 			socket.prependListener('close', () => {
 				if (!properLastChunkReceived) {
-					const err = new Error('Premature close');
-					err.code = 'ERR_STREAM_PREMATURE_CLOSE';
-					errorCallback(err);
+					const error = new Error('Premature close');
+					error.code = 'ERR_STREAM_PREMATURE_CLOSE';
+					errorCallback(error);
 				}
 			});
 		}

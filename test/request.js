@@ -1,15 +1,13 @@
-
 import stream from 'stream';
 import http from 'http';
-import {TextEncoder} from 'util';
 
 import AbortController from 'abort-controller';
 import chai from 'chai';
 import FormData from 'form-data';
 import Blob from 'fetch-blob';
 
-import TestServer from './utils/server.js';
 import {Request} from '../src/index.js';
+import TestServer from './utils/server.js';
 
 const {expect} = chai;
 

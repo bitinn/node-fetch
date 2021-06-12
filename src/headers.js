@@ -11,9 +11,9 @@ const validateHeaderName = typeof http.validateHeaderName === 'function' ?
 	http.validateHeaderName :
 	name => {
 		if (!/^[\^`\-\w!#$%&'*+.|~]+$/.test(name)) {
-			const err = new TypeError(`Header name must be a valid HTTP token [${name}]`);
-			Object.defineProperty(err, 'code', {value: 'ERR_INVALID_HTTP_TOKEN'});
-			throw err;
+			const error = new TypeError(`Header name must be a valid HTTP token [${name}]`);
+			Object.defineProperty(error, 'code', {value: 'ERR_INVALID_HTTP_TOKEN'});
+			throw error;
 		}
 	};
 
@@ -21,9 +21,9 @@ const validateHeaderValue = typeof http.validateHeaderValue === 'function' ?
 	http.validateHeaderValue :
 	(name, value) => {
 		if (/[^\t\u0020-\u007E\u0080-\u00FF]/.test(value)) {
-			const err = new TypeError(`Invalid character in header content ["${name}"]`);
-			Object.defineProperty(err, 'code', {value: 'ERR_INVALID_CHAR'});
-			throw err;
+			const error = new TypeError(`Invalid character in header content ["${name}"]`);
+			Object.defineProperty(error, 'code', {value: 'ERR_INVALID_CHAR'});
+			throw error;
 		}
 	};
 

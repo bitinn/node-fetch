@@ -3,6 +3,13 @@ Changelog
 
 # 3.x release
 
+## v3.0.0-beta.10
+
+- **Breaking:** minimum supported Node.js version is now 12.8.
+- **Breaking:** node-fetch is now a pure ESM module.
+- Other: update readme to inform users about ESM.
+- Other: update dependencies.
+
 ## v3.0.0-beta.9
 
 **This is an important security release. It is strongly recommended to update as soon as possible.**

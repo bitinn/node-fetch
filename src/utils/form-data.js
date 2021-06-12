@@ -67,11 +67,7 @@ export function getFormDataLength(form, boundary) {
 	for (const [name, value] of form) {
 		length += Buffer.byteLength(getHeader(boundary, name, value));
 
-		if (isBlob(value)) {
-			length += value.size;
-		} else {
-			length += Buffer.byteLength(String(value));
-		}
+		length += isBlob(value) ? value.size : Buffer.byteLength(String(value));
 
 		length += carriageLength;
 	}

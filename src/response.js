@@ -13,6 +13,8 @@ const INTERNALS = Symbol('Response internals');
 /**
  * Response class
  *
+ * Ref: https://fetch.spec.whatwg.org/#response-class
+ *
  * @param   Stream  body  Readable stream
  * @param   Object  opts  Response options
  * @return  Void
@@ -136,4 +138,3 @@ Object.defineProperties(Response.prototype, {
 	headers: {enumerable: true},
 	clone: {enumerable: true}
 });
-

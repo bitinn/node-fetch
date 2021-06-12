@@ -1,11 +1,10 @@
-import FormData from 'formdata-node';
+import {FormData} from 'formdata-node';
 import Blob from 'fetch-blob';
 
 import chai from 'chai';
 
-import read from './utils/read-stream.js';
-
 import {getFormDataLength, getBoundary, formDataIterator} from '../src/utils/form-data.js';
+import read from './utils/read-stream.js';
 
 const {expect} = chai;
 

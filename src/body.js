@@ -69,10 +69,10 @@ export default class Body {
 		this.size = size;
 
 		if (body instanceof Stream) {
-			body.on('error', err => {
-				const error = err instanceof FetchBaseError ?
-					err :
-					new FetchError(`Invalid response body while trying to fetch ${this.url}: ${err.message}`, 'system', err);
+			body.on('error', error_ => {
+				const error = error_ instanceof FetchBaseError ?
+					error_ :
+					new FetchError(`Invalid response body while trying to fetch ${this.url}: ${error_.message}`, 'system', error_);
 				this[INTERNALS].error = error;
 			});
 		}
@@ -177,7 +177,7 @@ async function consumeBody(data) {
 
 	// Body is blob
 	if (isBlob(body)) {
-		body = body.stream();
+		body = Stream.Readable.from(body.stream());
 	}
 
 	// Body is buffer
@@ -198,21 +198,17 @@ async function consumeBody(data) {
 	try {
 		for await (const chunk of body) {
 			if (data.size > 0 && accumBytes + chunk.length > data.size) {
-				const err = new FetchError(`content size at ${data.url} over limit: ${data.size}`, 'max-size');
-				body.destroy(err);
-				throw err;
+				const error = new FetchError(`content size at ${data.url} over limit: ${data.size}`, 'max-size');
+				body.destroy(error);
+				throw error;
 			}
 
 			accumBytes += chunk.length;
 			accum.push(chunk);
 		}
 	} catch (error) {
-		if (error instanceof FetchBaseError) {
-			throw error;
-		} else {
-			// Other errors, such as incorrect content-encoding
-			throw new FetchError(`Invalid response body while trying to fetch ${data.url}: ${error.message}`, 'system', error);
-		}
+		const error_ = error instanceof FetchBaseError ? error : new FetchError(`Invalid response body while trying to fetch ${data.url}: ${error.message}`, 'system', error);
+		throw error_;
 	}
 
 	if (body.readableEnded === true || body._readableState.ended === true) {
@@ -371,7 +367,7 @@ export const writeToStream = (dest, {body}) => {
 		dest.end();
 	} else if (isBlob(body)) {
 		// Body is Blob
-		body.stream().pipe(dest);
+		Stream.Readable.from(body.stream()).pipe(dest);
 	} else if (Buffer.isBuffer(body)) {
 		// Body is buffer
 		dest.write(body);
@@ -381,4 +377,3 @@ export const writeToStream = (dest, {body}) => {
 		body.pipe(dest);
 	}
 };
-

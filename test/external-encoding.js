@@ -1,5 +1,5 @@
-import fetch from '../src/index.js';
 import chai from 'chai';
+import fetch from '../src/index.js';
 
 const {expect} = chai;
 

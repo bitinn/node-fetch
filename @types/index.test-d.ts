@@ -1,38 +1,37 @@
-import { expectType, expectAssignable } from 'tsd';
+import {expectType, expectAssignable} from 'tsd';
 import AbortController from 'abort-controller';
-import Blob = require('fetch-blob');
+import Blob from 'fetch-blob';
 
-import fetch, { Request, Response, Headers, Body, FetchError, AbortError } from '.';
+import fetch, {Request, Response, Headers, Body, FetchError, AbortError} from '.';
 import * as _fetch from '.';
-import __fetch = require('.');
 
 async function run() {
-	const getRes = await fetch('https://bigfile.com/test.zip');
-	expectType<boolean>(getRes.ok);
-	expectType<number>(getRes.size);
-	expectType<number>(getRes.status);
-	expectType<string>(getRes.statusText);
-	expectType<() => Response>(getRes.clone);
+	const getResponse = await fetch('https://bigfile.com/test.zip');
+	expectType<boolean>(getResponse.ok);
+	expectType<number>(getResponse.size);
+	expectType<number>(getResponse.status);
+	expectType<string>(getResponse.statusText);
+	expectType<() => Response>(getResponse.clone);
 
 	// Test async iterator over body
-	expectType<NodeJS.ReadableStream | null>(getRes.body);
-	if (getRes.body) {
-		for await (const data of getRes.body) {
+	expectType<NodeJS.ReadableStream | null>(getResponse.body);
+	if (getResponse.body) {
+		for await (const data of getResponse.body) {
 			expectType<Buffer | string>(data);
 		}
 	}
 
 	// Test Buffer
-	expectType<Buffer>(await getRes.buffer());
+	expectType<Buffer>(await getResponse.buffer());
 
 	// Test arrayBuffer
-	expectType<ArrayBuffer>(await getRes.arrayBuffer());
+	expectType<ArrayBuffer>(await getResponse.arrayBuffer());
 
 	// Test JSON, returns unknown
-	expectType<unknown>(await getRes.json());
+	expectType<unknown>(await getResponse.json());
 
 	// Headers iterable
-	expectType<Headers>(getRes.headers);
+	expectType<Headers>(getResponse.headers);
 
 	// Post
 	try {
@@ -40,7 +39,7 @@ async function run() {
 		expectType<string>(request.url);
 		expectType<Headers>(request.headers);
 
-		const headers = new Headers({ byaka: 'buke' });
+		const headers = new Headers({byaka: 'buke'});
 		expectType<(a: string, b: string) => void>(headers.append);
 		expectType<(a: string) => string | null>(headers.get);
 		expectType<(name: string, value: string) => void>(headers.set);
@@ -49,11 +48,11 @@ async function run() {
 		expectType<() => IterableIterator<[string, string]>>(headers.entries);
 		expectType<() => IterableIterator<[string, string]>>(headers[Symbol.iterator]);
 
-		const postRes = await fetch(request, { method: 'POST', headers });
-		expectType<Blob>(await postRes.blob());
-	} catch (error) {
+		const postResponse = await fetch(request, {method: 'POST', headers});
+		expectType<Blob>(await postResponse.blob());
+	} catch (error: unknown) {
 		if (error instanceof FetchError) {
-			throw new TypeError(error.errno);
+			throw new TypeError(error.errno as string | undefined);
 		}
 
 		if (error instanceof AbortError) {
@@ -62,31 +61,24 @@ async function run() {
 	}
 
 	// export *
-	const wildRes = await _fetch('https://google.com');
-	expectType<boolean>(wildRes.ok);
-	expectType<number>(wildRes.size);
-	expectType<number>(wildRes.status);
-	expectType<string>(wildRes.statusText);
-	expectType<() => Response>(wildRes.clone);
-
-	// export = require
-	const reqRes = await __fetch('https://google.com');
-	expectType<boolean>(reqRes.ok);
-	expectType<number>(reqRes.size);
-	expectType<number>(reqRes.status);
-	expectType<string>(reqRes.statusText);
-	expectType<() => Response>(reqRes.clone);
+	const wildResponse = await _fetch.default('https://google.com');
+	expectType<boolean>(wildResponse.ok);
+	expectType<number>(wildResponse.size);
+	expectType<number>(wildResponse.status);
+	expectType<string>(wildResponse.statusText);
+	expectType<() => Response>(wildResponse.clone);
 
 	// Others
 	const response = new Response();
 	expectType<string>(response.url);
 	expectAssignable<Body>(response);
 
-	const abortController = new AbortController()
-	const request = new Request('url', { signal: abortController.signal });
+	const abortController = new AbortController();
+	const request = new Request('url', {signal: abortController.signal});
 	expectAssignable<Body>(request);
 
-	new Headers({ 'Header': 'value' });
+	/* eslint-disable no-new */
+	new Headers({Header: 'value'});
 	// new Headers(['header', 'value']); // should not work
 	new Headers([['header', 'value']]);
 	new Headers(new Headers());
@@ -95,8 +87,7 @@ async function run() {
 		['b', '2'],
 		new Map([['a', null], ['3', null]]).keys()
 	]);
-
-	fetch.isRedirect = (code: number) => true;
+	/* eslint-enable no-new */
 }
 
 run().finally(() => {

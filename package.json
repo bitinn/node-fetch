@@ -1,34 +1,23 @@
 {
   "name": "node-fetch",
-  "version": "3.0.0-beta.9",
+  "version": "3.0.0-beta.10",
   "description": "A light-weight module that brings Fetch API to node.js",
-  "main": "./dist/index.cjs",
-  "module": "./src/index.js",
+  "main": "./src/index.js",
   "sideEffects": false,
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./src/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
   "files": [
     "src",
-    "dist",
     "@types/index.d.ts"
   ],
   "types": "./@types/index.d.ts",
   "engines": {
-    "node": "^10.17 || >=12.3"
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "scripts": {
-    "build": "rollup -c",
-    "test": "node --experimental-modules node_modules/c8/bin/c8 --reporter=html --reporter=lcov --reporter=text --check-coverage node --experimental-modules node_modules/mocha/bin/mocha",
+    "test": "c8 --reporter=html --reporter=lcov --reporter=text --check-coverage mocha",
     "coverage": "c8 report --reporter=text-lcov | coveralls",
     "test-types": "tsd",
-    "lint": "xo",
-    "prepublishOnly": "node ./test/commonjs/test-artifact.js"
+    "lint": "xo"
   },
   "repository": {
     "type": "git",
@@ -58,38 +47,28 @@
     "abort-controller": "^3.0.0",
     "abortcontroller-polyfill": "^1.7.1",
     "busboy": "^0.3.1",
-    "c8": "^7.3.0",
-    "chai": "^4.2.0",
+    "c8": "^7.7.2",
+    "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-iterator": "^3.0.2",
     "chai-string": "^1.5.0",
     "coveralls": "^3.1.0",
-    "delay": "^4.4.0",
-    "form-data": "^3.0.0",
-    "formdata-node": "^2.4.0",
-    "mocha": "^8.1.3",
-    "p-timeout": "^3.2.0",
-    "rollup": "^2.26.10",
-    "tsd": "^0.13.1",
-    "xo": "^0.33.1"
+    "delay": "^5.0.0",
+    "form-data": "^4.0.0",
+    "formdata-node": "^3.5.3",
+    "mocha": "^8.3.2",
+    "p-timeout": "^5.0.0",
+    "tsd": "^0.14.0",
+    "xo": "^0.39.1"
   },
   "dependencies": {
     "data-uri-to-buffer": "^3.0.1",
-    "fetch-blob": "^2.1.1"
-  },
-  "esm": {
-    "sourceMap": true,
-    "cjs": false
+    "fetch-blob": "^3.0.0"
   },
   "tsd": {
     "cwd": "@types",
     "compilerOptions": {
-      "target": "esnext",
-      "lib": [
-        "es2018"
-      ],
-      "allowSyntheticDefaultImports": false,
-      "esModuleInterop": false
+      "esModuleInterop": true
     }
   },
   "xo": {
@@ -97,19 +76,23 @@
       "node",
       "browser"
     ],
+    "ignores": [
+      "example.js"
+    ],
     "rules": {
       "complexity": 0,
       "import/extensions": 0,
       "import/no-useless-path-segments": 0,
       "import/no-anonymous-default-export": 0,
+      "import/no-named-as-default": 0,
       "unicorn/import-index": 0,
-      "unicorn/no-reduce": 0,
-      "capitalized-comments": 0
+      "unicorn/no-array-reduce": 0,
+      "unicorn/prefer-node-protocol": 0,
+      "unicorn/numeric-separators-style": 0,
+      "unicorn/explicit-length-check": 0,
+      "capitalized-comments": 0,
+      "@typescript-eslint/member-ordering": 0
     },
-    "ignores": [
-      "dist",
-      "@types"
-    ],
     "overrides": [
       {
         "files": "test/**/*.js",
@@ -122,15 +105,10 @@
           "no-unused-expressions": 0,
           "new-cap": 0,
           "guard-for-in": 0,
+          "unicorn/no-array-for-each": 0,
           "unicorn/prevent-abbreviations": 0,
           "promise/prefer-await-to-then": 0,
           "ava/no-import-test-files": 0
-        }
-      },
-      {
-        "files": "example.js",
-        "rules": {
-          "import/no-extraneous-dependencies": 0
         }
       }
     ]

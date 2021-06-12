@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get Node.JS version from package.json
+      - name: Get Node.js version from package.json
         if: matrix.node == 'engines'
         id: get-version
         run: echo ::set-output name=node::$(npx --q minimum-node-version)
@@ -48,14 +48,9 @@ jobs:
 
       - run: npm install
 
-      - run: npm test -- --colors
-        if: matrix.node != 'engines'
-
       - name: Test without coverage
         if: matrix.node == 'engines'
-        run: |
-          npm i esm
-          npx mocha -r esm --colors
+        run: npx mocha --colors --experimental-modules
 
       # upload coverage only once
       - name: Coveralls

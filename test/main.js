@@ -7,20 +7,19 @@ import stream from 'stream';
 import path from 'path';
 import {lookup} from 'dns';
 import vm from 'vm';
-import {TextEncoder} from 'util';
 import chai from 'chai';
 import chaiPromised from 'chai-as-promised';
 import chaiIterator from 'chai-iterator';
 import chaiString from 'chai-string';
 import FormData from 'form-data';
-import FormDataNode from 'formdata-node';
+import {FormData as FormDataNode} from 'formdata-node';
 import delay from 'delay';
 import AbortControllerMysticatea from 'abort-controller';
 import abortControllerPolyfill from 'abortcontroller-polyfill/dist/abortcontroller.js';
-const AbortControllerPolyfill = abortControllerPolyfill.AbortController;
 
 // Test subjects
 import Blob from 'fetch-blob';
+import {fileFromSync} from 'fetch-blob/from.js';
 
 import fetch, {
 	FetchError,
@@ -34,12 +33,13 @@ import RequestOrig from '../src/request.js';
 import ResponseOrig from '../src/response.js';
 import Body, {getTotalBytes, extractContentType} from '../src/body.js';
 import TestServer from './utils/server.js';
+import chaiTimeout from './utils/chai-timeout.js';
+
+const AbortControllerPolyfill = abortControllerPolyfill.AbortController;
 
 const {
 	Uint8Array: VMUint8Array
 } = vm.runInNewContext('this');
-
-import chaiTimeout from './utils/chai-timeout.js';
 
 chai.use(chaiPromised);
 chai.use(chaiIterator);
@@ -608,7 +608,7 @@ describe('node-fetch', () => {
 			expect(res.status).to.equal(200);
 			expect(res.ok).to.be.true;
 			return expect(res.text()).to.eventually.be.rejectedWith(Error)
-				.and.have.property('message').matches(/Premature close|The operation was aborted/);
+				.and.have.property('message').matches(/Premature close|The operation was aborted|aborted/);
 		});
 	});
 
@@ -635,9 +635,9 @@ describe('node-fetch', () => {
 			const read = async body => {
 				const chunks = [];
 
-				if (process.version < 'v14') {
-					// In Node.js 12, some errors don't come out in the async iterator; we have to pick
-					// them up from the event-emitter and then throw them after the async iterator
+				if (process.version < 'v14.15.2') {
+					// In older Node.js versions, some errors don't come out in the async iterator; we have
+					// to pick them up from the event-emitter and then throw them after the async iterator
 					let error;
 					body.on('error', err => {
 						error = err;
@@ -881,7 +881,7 @@ describe('node-fetch', () => {
 			.then(res => {
 				expect(res.status).to.equal(200);
 			})
-			.catch(() => { })
+			.catch(() => {})
 			.then(() => {
 				// Wait a few ms to see if a uncaught error occurs
 				setTimeout(() => {
@@ -1083,7 +1083,7 @@ describe('node-fetch', () => {
 
 			it('should cancel request body of type Stream with AbortError when aborted', () => {
 				const body = new stream.Readable({objectMode: true});
-				body._read = () => { };
+				body._read = () => {};
 				const promise = fetch(
 					`${base}slow`,
 					{signal: controller.signal, body, method: 'POST'}
@@ -1400,7 +1400,7 @@ describe('node-fetch', () => {
 			expect(res.method).to.equal('POST');
 			expect(res.body).to.equal('a=1');
 			expect(res.headers['transfer-encoding']).to.be.undefined;
-			expect(res.headers['content-type']).to.equal('text/plain;charset=utf-8');
+			expect(res.headers['content-type']).to.equal('text/plain;charset=UTF-8');
 			expect(res.headers['content-length']).to.equal('3');
 		});
 	});
@@ -1491,9 +1491,7 @@ describe('node-fetch', () => {
 		const filename = path.join('test', 'utils', 'dummy.txt');
 
 		form.set('field', 'some text');
-		form.set('file', fs.createReadStream(filename), {
-			size: fs.statSync(filename).size
-		});
+		form.set('file', fileFromSync(filename));
 
 		const url = `${base}multipart`;
 		const options = {
@@ -1577,7 +1575,7 @@ describe('node-fetch', () => {
 	});
 
 	it('should still recognize URLSearchParams when extended', () => {
-		class CustomSearchParameters extends URLSearchParams { }
+		class CustomSearchParameters extends URLSearchParams {}
 		const parameters = new CustomSearchParameters();
 		parameters.append('a', '1');
 
@@ -1599,7 +1597,7 @@ describe('node-fetch', () => {
 	/* For 100% code coverage, checks for duck-typing-only detection
 	 * where both constructor.name and brand tests fail */
 	it('should still recognize URLSearchParams when extended from polyfill', () => {
-		class CustomPolyfilledSearchParameters extends URLSearchParams { }
+		class CustomPolyfilledSearchParameters extends URLSearchParams {}
 		const parameters = new CustomPolyfilledSearchParameters();
 		parameters.append('a', '1');
 
@@ -1904,7 +1902,7 @@ describe('node-fetch', () => {
 			res.end(crypto.randomBytes(firstPacketMaxSize + secondPacketSize - 1));
 		});
 		return expect(
-			fetch(url).then(res => res.clone().buffer())
+			fetch(url).then(res => res.clone().buffer()).then(console.log)
 		).not.to.timeout;
 	});
 
@@ -2060,8 +2058,8 @@ describe('node-fetch', () => {
 	it('should support reading blob as stream', () => {
 		return new Response('hello')
 			.blob()
-			.then(blob => streamToPromise(blob.stream(), data => {
-				const string = data.toString();
+			.then(blob => streamToPromise(stream.Readable.from(blob.stream()), data => {
+				const string = Buffer.from(data).toString();
 				expect(string).to.equal('hello');
 			}));
 	});
@@ -2072,7 +2070,7 @@ describe('node-fetch', () => {
 		let length;
 		let type;
 
-		return fetch(url).then(res => res.blob()).then(blob => {
+		return fetch(url).then(res => res.blob()).then(async blob => {
 			const url = `${base}inspect`;
 			length = blob.size;
 			type = blob.type;
@@ -2167,6 +2165,8 @@ describe('node-fetch', () => {
 		let called = 0;
 		function lookupSpy(hostname, options, callback) {
 			called++;
+
+			// eslint-disable-next-line node/prefer-promises/dns
 			return lookup(hostname, options, callback);
 		}
 
@@ -2182,6 +2182,8 @@ describe('node-fetch', () => {
 		const family = Symbol('family');
 		function lookupSpy(hostname, options, callback) {
 			families.push(options.family);
+
+			// eslint-disable-next-line node/prefer-promises/dns
 			return lookup(hostname, {}, callback);
 		}
 

@@ -102,7 +102,7 @@ See Jason Miller's [isomorphic-unfetch](https://www.npmjs.com/package/isomorphic
 
 ## Installation
 
-Current stable release (`3.x`)
+Current stable release (`3.x`) requires at least Node.js 12.8.0.
 
 ```sh
 npm install node-fetch
@@ -111,24 +111,18 @@ npm install node-fetch
 ## Loading and configuring the module
 
 ```js
-// CommonJS
-const fetch = require('node-fetch');
-
-// ES Module
 import fetch from 'node-fetch';
 ```
 
 If you want to patch the global object in node:
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 if (!globalThis.fetch) {
 	globalThis.fetch = fetch;
 }
 ```
-
-For versions of Node earlier than 12, use this `globalThis` [polyfill](https://mathiasbynens.be/notes/globalthis).
 
 ## Upgrading
 
@@ -145,7 +139,7 @@ NOTE: The documentation below is up-to-date with `3.x` releases, if you are usin
 ### Plain text or HTML
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://github.com/');
 const body = await response.text();
@@ -156,7 +150,7 @@ console.log(body);
 ### JSON
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://api.github.com/users/github');
 const data = await response.json();
@@ -167,7 +161,7 @@ console.log(data);
 ### Simple Post
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://httpbin.org/post', {method: 'POST', body: 'a=1'});
 const data = await response.json();
@@ -178,7 +172,7 @@ console.log(data);
 ### Post with JSON
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const body = {a: 1};
 
@@ -199,7 +193,7 @@ console.log(data);
 NOTE: The `Content-Type` header is only set automatically to `x-www-form-urlencoded` when an instance of `URLSearchParams` is given as such:
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const params = new URLSearchParams();
 params.append('a', 1);
@@ -217,7 +211,7 @@ NOTE: 3xx-5xx responses are _NOT_ exceptions, and should be handled in `then()`,
 Wrapping the fetch function into a `try/catch` block will catch _all_ exceptions, such as errors originating from node core libraries, like network errors, and operational errors which are instances of FetchError. See the [error handling document][error-handling.md] for more details.
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 try {
 	await fetch('https://domain.invalid/');
@@ -231,7 +225,7 @@ try {
 It is common to create a helper function to check that the response contains no client (4xx) or server (5xx) error responses:
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 class HTTPResponseError extends Error {
 	constructor(response, ...args) {
@@ -272,10 +266,10 @@ Cookies are not stored by default. However, cookies can be extracted and passed 
 The "Node.js way" is to use streams when possible. You can pipe `res.body` to another stream. This example uses [stream.pipeline](https://nodejs.org/api/stream.html#stream_stream_pipeline_streams_callback) to attach stream error handlers and wait for the download to complete.
 
 ```js
-const {createWriteStream} = require('fs');
-const {pipeline} = require('stream');
-const {promisify} = require('util');
-const fetch = require('node-fetch');
+import {createWriteStream} from 'fs';
+import {pipeline} from 'stream';
+import {promisify} from 'util'
+import fetch from 'node-fetch';
 
 const streamPipeline = promisify(pipeline);
 
@@ -290,7 +284,7 @@ In Node.js 14 you can also use async iterators to read `body`; however, be caref
 errors -- the longer a response runs, the more likely it is to encounter an error.
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://httpbin.org/stream/3');
 
@@ -308,7 +302,7 @@ did not mature until Node.js 14, so you need to do some extra work to ensure you
 directly from the stream and wait on it response to fully close.
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const read = async body => {
 	let error;
@@ -340,8 +334,8 @@ try {
 If you prefer to cache binary data in full, use buffer(). (NOTE: buffer() is a `node-fetch` only API)
 
 ```js
-const fetch = require('node-fetch');
-const fileType = require('file-type');
+import fetch from 'node-fetch';
+import fileType from 'file-type';
 
 const response = await fetch('https://octodex.github.com/images/Fintechtocat.png');
 const buffer = await response.buffer();
@@ -353,7 +347,7 @@ console.log(type);
 ### Accessing Headers and other Meta data
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://github.com/');
 
@@ -369,7 +363,7 @@ console.log(response.headers.get('content-type'));
 Unlike browsers, you can access raw `Set-Cookie` headers manually using `Headers.raw()`. This is a `node-fetch` only API.
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://example.com');
 
@@ -380,8 +374,8 @@ console.log(response.headers.raw()['set-cookie']);
 ### Post data using a file stream
 
 ```js
-const {createReadStream} = require('fs');
-const fetch = require('node-fetch');
+import {createReadStream} from 'fs';
+import fetch from 'node-fetch';
 
 const stream = createReadStream('input.txt');
 
@@ -391,40 +385,11 @@ const data = await response.json();
 console.log(data)
 ```
 
-### Post with form-data (detect multipart)
+node-fetch also supports spec-compliant FormData implementations such as [formdata-polyfill](https://www.npmjs.com/package/formdata-polyfill) and [formdata-node](https://github.com/octet-stream/form-data):
 
 ```js
-const fetch = require('node-fetch');
-const FormData = require('form-data');
-
-const form = new FormData();
-form.append('a', 1);
-
-const response = await fetch('https://httpbin.org/post', {method: 'POST', body: form});
-const data = await response.json();
-
-console.log(data)
-
-// OR, using custom headers
-// NOTE: getHeaders() is non-standard API
-
-const options = {
-	method: 'POST',
-	body: form,
-	headers: form.getHeaders()
-};
-
-const response = await fetch('https://httpbin.org/post', options);
-const data = await response.json();
-
-console.log(data)
-```
-
-node-fetch also supports spec-compliant FormData implementations such as [form-data](https://github.com/form-data/form-data) and [formdata-node](https://github.com/octet-stream/form-data):
-
-```js
-const fetch = require('node-fetch');
-const FormData = require('formdata-node');
+import fetch from 'node-fetch';
+import FormData from 'formdata-node';
 
 const form = new FormData();
 form.set('greeting', 'Hello, world!');
@@ -435,6 +400,8 @@ const data = await response.json();
 console.log(data);
 ```
 
+node-fetch also support form-data but it's now discouraged due to not being spec-compliant and needs workarounds to function - which we hope to remove one day
+
 ### Request cancellation with AbortSignal
 
 You may cancel requests with `AbortController`. A suggested implementation is [`abort-controller`](https://www.npmjs.com/package/abort-controller).
@@ -442,8 +409,8 @@ You may cancel requests with `AbortController`. A suggested implementation is [`
 An example of timing out a request after 150ms could be achieved as the following:
 
 ```js
-const fetch = require('node-fetch');
-const AbortController = require('abort-controller');
+import fetch from 'node-fetch';
+import AbortController from 'abort-controller';
 
 const controller = new AbortController();
 const timeout = setTimeout(() => {
@@ -530,8 +497,8 @@ See [`http.Agent`](https://nodejs.org/api/http.html#http_new_agent_options) for 
 In addition, the `agent` option accepts a function that returns `http`(s)`.Agent` instance given current [URL](https://nodejs.org/api/url.html), this is useful during a redirection chain across HTTP and HTTPS protocol.
 
 ```js
-const http = require('http');
-const https = require('https');
+import http from 'http';
+import https from 'https';
 
 const httpAgent = new http.Agent({
 	keepAlive: true
@@ -560,7 +527,7 @@ Stream on Node.js have a smaller internal buffer size (16kB, aka `highWaterMark`
 The recommended way to fix this problem is to resolve cloned response in parallel:
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://example.com');
 const r1 = await response.clone();
@@ -574,7 +541,7 @@ console.log(results[1]);
 If for some reason you don't like the solution above, since `3.x` you are able to modify the `highWaterMark` option:
 
 ```js
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const response = await fetch('https://example.com', {
 	// About 1MB
@@ -684,7 +651,7 @@ Construct a new `Headers` object. `init` can be either `null`, a `Headers` objec
 
 ```js
 // Example adapted from https://fetch.spec.whatwg.org/#example-headers-class
-const {Headers} = require('node-fetch');
+import {Headers} from 'node-fetch';
 
 const meta = {
 	'Content-Type': 'text/xml',
@@ -786,7 +753,7 @@ Thanks to [github/fetch](https://github.com/github/fetch) for providing a solid 
 
 | [![David Frank](https://github.com/bitinn.png?size=100)](https://github.com/bitinn) | [![Jimmy Wärting](https://github.com/jimmywarting.png?size=100)](https://github.com/jimmywarting) | [![Antoni Kepinski](https://github.com/xxczaki.png?size=100)](https://github.com/xxczaki) | [![Richie Bendall](https://github.com/Richienb.png?size=100)](https://github.com/Richienb) | [![Gregor Martynus](https://github.com/gr2m.png?size=100)](https://github.com/gr2m) |
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| [David Frank](https://bitinn.net/)                                                  | [Jimmy Wärting](https://jimmy.warting.se/)                                                        | [Antoni Kepinski](https://kepinski.me)                                                    | [Richie Bendall](https://www.richie-bendall.ml/)                                           | [Gregor Martynus](https://twitter.com/gr2m)                                         |
+| [David Frank](https://bitinn.net/)                                                  | [Jimmy Wärting](https://jimmy.warting.se/)                                                        | [Antoni Kepinski](https://kepinski.ch)                                                    | [Richie Bendall](https://www.richie-bendall.ml/)                                           | [Gregor Martynus](https://twitter.com/gr2m)                                         |
 
 ###### Former
 

@@ -1,5 +1,3 @@
-'use strict';
-
 export class FetchBaseError extends Error {
 	constructor(message, type) {
 		super(message);
@@ -17,4 +15,3 @@ export class FetchBaseError extends Error {
 		return this.constructor.name;
 	}
 }
-

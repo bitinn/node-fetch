@@ -31,6 +31,8 @@ const isRequest = object => {
 /**
  * Request class
  *
+ * Ref: https://fetch.spec.whatwg.org/#request-class
+ *
  * @param   Mixed   input  Url or Request instance
  * @param   Object  init   Custom options
  * @return  Void
