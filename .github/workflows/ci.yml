@@ -14,47 +14,34 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        node: ["14", "12", engines]
+        node: ["12.20.0", "14.13.1", "16.0.0"]
         exclude:
           # On Windows, run tests with only the LTS environments.
           - os: windows-latest
-            node: engines
+            node: "12.20.0"
           - os: windows-latest
-            node: "14"
+            node: "16.0.0"
           # On macOS, run tests with only the LTS environments.
           - os: macOS-latest
-            node: engines
+            node: "12.20.0"
           - os: macOS-latest
-            node: "14"
+            node: "16.0.0"
 
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get Node.js version from package.json
-        if: matrix.node == 'engines'
-        id: get-version
-        run: echo ::set-output name=node::$(npx --q minimum-node-version)
-
-      - uses: actions/setup-node@v2-beta
-        if: matrix.node != 'engines'
+      - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
 
-      - uses: actions/setup-node@v2-beta
-        if: matrix.node == 'engines'
-        with:
-          node-version: ${{steps.get-version.outputs.node}}
-
       - run: npm install
 
-      - name: Test without coverage
-        if: matrix.node == 'engines'
-        run: npx mocha --colors --experimental-modules
+      - run: npm test -- --colors
 
       # upload coverage only once
       - name: Coveralls
         uses: coverallsapp/github-action@master
-        if: matrix.node == '12' && matrix.os == 'ubuntu-latest'
+        if: matrix.node == '16.0.0' && matrix.os == 'ubuntu-latest'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
