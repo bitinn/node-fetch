@@ -14,7 +14,8 @@
         } ]
       ],
       plugins: [
-        './build/babel-plugin'
+        './build/babel-plugin',
+        'transform-async-generator-functions'
       ]
     },
     coverage: {
@@ -31,7 +32,8 @@
       ],
       plugins: [
         [ 'istanbul', { exclude: [ 'src/blob.js', 'build', 'test' ] } ],
-        './build/babel-plugin'
+        './build/babel-plugin',
+        'transform-async-generator-functions'
       ]
     },
     rollup: {

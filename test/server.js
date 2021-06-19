@@ -317,6 +317,34 @@ export default class TestServer {
 			res.destroy();
 		}
 
+		if (p === '/error/premature/chunked') {
+			res.writeHead(200, {
+				'Content-Type': 'application/json',
+				'Transfer-Encoding': 'chunked'
+			});
+
+			// Transfer-Encoding: 'chunked' sends chunk sizes followed by the
+			// chunks - https://en.wikipedia.org/wiki/Chunked_transfer_encoding
+			const sendChunk = (obj) => {
+				const data = JSON.stringify(obj)
+
+				res.write(`${data.length}\r\n`)
+				res.write(`${data}\r\n`)
+			}
+
+			sendChunk({data: 'hi'})
+
+			setTimeout(() => {
+				sendChunk({data: 'bye'})
+			}, 200);
+
+			setTimeout(() => {
+				// should send '0\r\n\r\n' to end the response properly but instead
+				// just close the connection
+				res.destroy();
+			}, 400);
+		}
+
 		if (p === '/error/json') {
 			res.statusCode = 200;
 			res.setHeader('Content-Type', 'application/json');
