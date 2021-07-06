@@ -71,7 +71,7 @@
     "p-timeout": "^3.2.0",
     "rollup": "^2.26.10",
     "tsd": "^0.13.1",
-    "xo": "^0.33.1"
+    "xo": "^0.41.0"
   },
   "dependencies": {
     "data-uri-to-buffer": "^3.0.1",
